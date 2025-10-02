@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Domain Insight",
+  "description": "Show nameservers, A records, rDNS hostname, and company info for the current tab's domain using Cloudflare DNS + IPinfo.",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Domain Insight"
+  },
+  "permissions": ["activeTab", "tabs", "storage"],
+  "host_permissions": [
+    "https://cloudflare-dns.com/*",
+    "https://1.1.1.1/*",
+    "https://ipinfo.io/*"
+  ]
+}
+

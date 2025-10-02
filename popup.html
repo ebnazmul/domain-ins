@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Domain Insight</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Domain Insight</h1>
+    </header>
+
+    <main>
+      <!-- Target domain info -->
+      <section id="target">
+        <h2>Target</h2>
+        <dl class="kvgrid">
+          <dt>Domain</dt><dd id="target-host">⌛</dd>
+          <dt>Status</dt><dd id="domain-status">⌛</dd>
+          <dt>Expiry</dt><dd id="domain-expiry">⌛</dd>
+          <dt>Registrar</dt><dd id="domain-registrar">⌛</dd>
+        </dl>
+      </section>
+
+      <!-- NS records -->
+      <section>
+        <h2>Nameservers (NS)</h2>
+        <ul id="ns-list" class="pill-list"></ul>
+        <div id="ns-empty" class="empty">No NS found.</div>
+      </section>
+
+      <!-- A records -->
+      <section>
+        <h2>A Records</h2>
+        <div class="subgroup">
+          <div class="subhead">Hostname (current tab)</div>
+          <ul id="a-host-list" class="pill-list"></ul>
+          <div id="a-host-empty" class="empty">No A record found for hostname.</div>
+        </div>
+        <div class="subgroup">
+          <div class="subhead">Apex / Registrable Domain</div>
+          <div class="muted" id="apex-name">—</div>
+          <ul id="a-apex-list" class="pill-list"></ul>
+          <div id="a-apex-empty" class="empty">No A record found for apex.</div>
+        </div>
+      </section>
+
+      <!-- IP details -->
+      <section>
+        <h2>IP Details (first A)</h2>
+        <div class="grid2">
+          <div class="kv"><span class="k">IP</span><span class="v" id="ip"></span></div>
+          <div class="kv"><span class="k">rDNS</span><span class="v" id="rdns"></span></div>
+          <div class="kv"><span class="k">Org</span><span class="v" id="org"></span></div>
+          <div class="kv"><span class="k">ASN</span><span class="v" id="asn"></span></div>
+          <div class="kv"><span class="k">Company</span><span class="v" id="company"></span></div>
+          <div class="kv"><span class="k">Country/Region</span><span class="v" id="loc"></span></div>
+        </div>
+      </section>
+
+      <!-- Settings (collapsed by default) -->
+      <section>
+        <details>
+          <summary>Settings</summary>
+          <label class="field">
+            <span>IPinfo Token</span>
+            <input id="ipinfo-token" placeholder="Optional but recommended" />
+          </label>
+          <button id="save">Save</button>
+        </details>
+      </section>
+
+      <!-- Error output -->
+      <section id="error" class="error hidden"></section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
