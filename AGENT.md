@@ -114,6 +114,7 @@ Security notes:
 - Sorted nameserver records with natural ordering so `ns1` appears before `ns2` and `ns10`.
 - Made `A` record chips link to `https://ipinfo.io/{ip}` in a new tab with `noopener noreferrer`.
 - Added a Chrome right-click context menu that opens the clicked link or page hostname at `https://dnslt.com/{hostname}`.
+- Hardened context-menu registration by recreating it on service-worker load, install, and browser startup.
 - Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
 - Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
 

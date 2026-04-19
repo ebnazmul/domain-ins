@@ -1,13 +1,20 @@
 const DNSLT_CONTEXT_MENU_ID = "open-dnslt-domain";
 const DNSLT_BASE_URL = "https://dnslt.com/";
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: DNSLT_CONTEXT_MENU_ID,
-    title: "Open domain in DNSLT",
-    contexts: ["page", "link"]
+setupContextMenu();
+
+chrome.runtime.onInstalled.addListener(setupContextMenu);
+chrome.runtime.onStartup.addListener(setupContextMenu);
+
+function setupContextMenu() {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: DNSLT_CONTEXT_MENU_ID,
+      title: "Open domain in DNSLT",
+      contexts: ["all"]
+    });
   });
-});
+}
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId !== DNSLT_CONTEXT_MENU_ID) return;
