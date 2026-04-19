@@ -12,22 +12,11 @@ function setupContextMenu() {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: DNSLT_CONTEXT_MENU_ID,
-      title: "Open in DNSLT",
-      contexts: ["selection"],
-      visible: false
+      title: "Open selected domain/IP in DNSLT",
+      contexts: ["selection"]
     });
   });
 }
-
-chrome.contextMenus.onShown.addListener((info) => {
-  const target = normalizeSelectedTarget(info.selectionText || "");
-
-  chrome.contextMenus.update(DNSLT_CONTEXT_MENU_ID, {
-    title: target ? `Open ${target.value} in DNSLT` : "Open in DNSLT",
-    visible: Boolean(target)
-  });
-  chrome.contextMenus.refresh();
-});
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId !== DNSLT_CONTEXT_MENU_ID) return;

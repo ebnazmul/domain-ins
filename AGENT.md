@@ -87,7 +87,7 @@ Security notes:
 - The popup never injects API responses as HTML.
 - Host permissions are limited to the APIs currently used.
 - No remote scripts, eval, or content scripts are used.
-- The context-menu service worker only validates selected domain/IPv4 text and opens `https://www.dnslt.com/domain/{domain}` or `https://www.dnslt.com/ip/{ip}`.
+- The context-menu service worker validates selected domain/IPv4 text on click and opens `https://www.dnslt.com/domain/{domain}` or `https://www.dnslt.com/ip/{ip}`.
 
 ## Progress Updates
 
@@ -115,6 +115,7 @@ Security notes:
 - Made `A` record chips link to `https://ipinfo.io/{ip}` in a new tab with `noopener noreferrer`.
 - Added a Chrome right-click context menu for selected domain/IPv4 text that opens the matching DNSLT domain or IP route.
 - Hardened context-menu registration by recreating it on service-worker load, install, and browser startup.
+- Removed reliance on `chrome.contextMenus.onShown` because some Chrome runtimes do not expose it and fail service-worker registration.
 - Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
 - Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
 
