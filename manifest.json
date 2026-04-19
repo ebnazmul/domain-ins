@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Domain Insight",
+  "description": "Show A records for the current tab's hostname using Cloudflare DNS-over-HTTPS.",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Domain Insight"
+  },
+  "permissions": ["activeTab", "tabs", "storage"],
+  "host_permissions": [
+    "https://cloudflare-dns.com/*",
+    "https://rdap.org/*",
+    "https://host.io/*",
+    "https://ipinfo.io/*"
+  ]
+}
