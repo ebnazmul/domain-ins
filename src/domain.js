@@ -1,4 +1,4 @@
-import { answersOfType, doh, fetchHostIoDns } from "./api.js";
+import { answersOfType, doh } from "./api.js";
 
 export function hostFromUrl(url) {
   try {
@@ -9,19 +9,9 @@ export function hostFromUrl(url) {
   }
 }
 
-export async function fetchARecords(hostname, hostIoToken) {
-  if (hostIoToken) {
-    try {
-      const dns = await fetchHostIoDns(hostname, hostIoToken);
-      const hostIoA = Array.isArray(dns?.a) ? dns.a.filter(Boolean) : [];
-      if (hostIoA.length) return hostIoA;
-    } catch {
-      // Fall through to DoH so a bad token or missing host.io data does not block the popup.
-    }
-  }
-
+export async function fetchARecords(hostname) {
   const json = await doh(hostname, "A");
-  return answersOfType(json, 1).map((answer) => answer.data);
+  return answersOfType(json, 1).map((answer) => normalizeDnsRecord(answer, json.resolver));
 }
 
 export async function findApex(hostname) {
@@ -40,7 +30,7 @@ export async function findApex(hostname) {
     candidates.map(async (candidate) => {
       try {
         const json = await doh(candidate, "NS");
-        const nsList = answersOfType(json, 2).map((answer) => answer.data).filter(Boolean);
+        const nsList = answersOfType(json, 2).map((answer) => normalizeDnsRecord(answer, json.resolver));
         return { candidate, nsList };
       } catch {
         return { candidate, nsList: [] };
@@ -52,17 +42,15 @@ export async function findApex(hostname) {
   return match ? { apex: match.candidate, nsList: match.nsList } : { apex: hostname, nsList: [] };
 }
 
-export async function loadNsRecords(apex, hostIoToken) {
-  if (hostIoToken) {
-    try {
-      const dns = await fetchHostIoDns(apex, hostIoToken);
-      const nsList = Array.isArray(dns?.ns) ? dns.ns.filter(Boolean) : [];
-      if (nsList.length) return nsList;
-    } catch {
-      // Fall back to DoH below.
-    }
-  }
-
+export async function loadNsRecords(apex) {
   const json = await doh(apex, "NS");
-  return answersOfType(json, 2).map((answer) => answer.data).filter(Boolean);
+  return answersOfType(json, 2).map((answer) => normalizeDnsRecord(answer, json.resolver));
+}
+
+function normalizeDnsRecord(answer, resolver) {
+  return {
+    value: answer.data,
+    ttl: Number.isFinite(answer.TTL) ? answer.TTL : null,
+    resolver
+  };
 }

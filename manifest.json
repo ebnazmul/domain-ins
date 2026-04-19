@@ -10,8 +10,8 @@
   "permissions": ["activeTab", "tabs", "storage"],
   "host_permissions": [
     "https://cloudflare-dns.com/*",
+    "https://dns.google/*",
     "https://rdap.org/*",
-    "https://host.io/*",
     "https://ipinfo.io/*"
   ]
 }

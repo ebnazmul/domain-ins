@@ -1,4 +1,4 @@
-import { CF_DOH_URL, HOST_IO_DNS_URL, IPINFO_URL, RDAP_DOMAIN_URL } from "./config.js";
+import { DNS_RESOLVERS, IPINFO_URL, RDAP_DOMAIN_URL } from "./config.js";
 
 async function fetchJson(url, options, errorPrefix) {
   const response = await fetch(url, options);
@@ -11,22 +11,42 @@ async function fetchJson(url, options, errorPrefix) {
 }
 
 export async function doh(name, type) {
-  const url = `${CF_DOH_URL}?name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}&cd=false`;
-  return fetchJson(url, { headers: { accept: "application/dns-json" } }, `${type} lookup failed`);
+  const errors = [];
+
+  for (const resolver of DNS_RESOLVERS) {
+    try {
+      const params = new URLSearchParams({
+        name,
+        type,
+        cd: "false",
+        _: String(Date.now())
+      });
+      const url = `${resolver.url}?${params.toString()}`;
+      const json = await fetchJson(
+        url,
+        {
+          cache: "no-store",
+          headers: {
+            accept: "application/dns-json",
+            pragma: "no-cache",
+            "cache-control": "no-cache"
+          }
+        },
+        `${resolver.name} ${type} lookup failed`
+      );
+
+      return { ...json, resolver: resolver.name };
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  throw new Error(errors.join("; ") || `${type} lookup failed`);
 }
 
 export function answersOfType(json, rrtype) {
   const answers = Array.isArray(json?.Answer) ? json.Answer : [];
   return answers.filter((answer) => answer.type === rrtype && answer.data);
-}
-
-export async function fetchHostIoDns(domain, token) {
-  if (!token) {
-    throw new Error("Missing host.io token");
-  }
-
-  const url = `${HOST_IO_DNS_URL}${encodeURIComponent(domain)}?token=${encodeURIComponent(token)}`;
-  return fetchJson(url, undefined, "host.io DNS lookup failed");
 }
 
 export async function fetchIpInfo(ip, token) {

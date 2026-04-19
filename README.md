@@ -24,18 +24,17 @@ It focuses on fast popup startup, progressive rendering, and useful hostname che
 
 - `cloudflare-dns.com` for DNS-over-HTTPS fallback lookups
 - `rdap.org` for domain registration details
-- `host.io` as an optional token-backed DNS source
 - `ipinfo.io` as optional enrichment for the first `A` record
+- `dns.google` as a secondary DNS-over-HTTPS resolver if Cloudflare fails
 
 ## API Token
 
-The popup has a top-right settings menu. You can save one shared token:
+The popup has a top-right settings menu. You can save one token:
 
-- `IPinfo / host.io` token
+- `IPinfo` token
 
 The extension stores the token in extension storage and reuses it for:
 
-- `host.io` DNS lookups when available
 - `ipinfo.io` enrichment for the first `A` record
 
 If the token is missing or invalid:
@@ -77,8 +76,8 @@ If the token is missing or invalid:
 Host permissions:
 
 - `https://cloudflare-dns.com/*`
+- `https://dns.google/*`
 - `https://rdap.org/*`
-- `https://host.io/*`
 - `https://ipinfo.io/*`
 
 ## Notes
@@ -87,6 +86,8 @@ Host permissions:
 - Main domain details appear first.
 - DNS, RDAP, and IP info fill in as results arrive.
 - Optional API failures degrade gracefully.
+- DNS records are fetched through live DNS-over-HTTPS queries with no-store fetch options and visible TTL values.
+- The Refresh button re-runs DNS and RDAP lookups for the active hostname while the popup is open.
 - `AGENT.md` is the repository source of truth for architecture, operational notes, and progress.
 
 ## Troubleshooting

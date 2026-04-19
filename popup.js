@@ -24,7 +24,8 @@ function setupSettings() {
         els.saveToken.disabled = true;
       }
 
-      await saveSettings();
+      const settings = await saveSettings();
+      currentApiToken = settings.api_token || "";
       showTokenStatus("Saved");
       clearError();
     } catch (error) {
@@ -39,12 +40,21 @@ function setupSettings() {
   });
 }
 
-function loadAddressRecords(hostname, apiToken) {
-  fetchARecords(hostname, apiToken)
-    .then((records) => {
-      renderList(els.aList, els.aEmpty, records);
+let currentHostname = "";
+let currentApiToken = "";
 
-      const firstIp = records[0];
+function formatDnsRecord(record) {
+  const ttl = Number.isFinite(record.ttl) ? `TTL ${record.ttl}s` : "TTL unknown";
+  const resolver = record.resolver ? `via ${record.resolver}` : "via DoH";
+  return `${record.value} (${ttl}, ${resolver})`;
+}
+
+function loadAddressRecords(hostname, apiToken) {
+  fetchARecords(hostname)
+    .then((records) => {
+      renderList(els.aList, els.aEmpty, records, formatDnsRecord);
+
+      const firstIp = records[0]?.value;
       if (!firstIp) {
         setIpInfoMessage("No A record found.");
         return;
@@ -73,13 +83,16 @@ function loadAddressRecords(hostname, apiToken) {
     });
 }
 
-function loadDomainDetails(hostname, apiToken) {
+function loadDomainDetails(hostname) {
   findApex(hostname)
     .then(async ({ apex }) => {
       setText(els.registrable, apex);
 
-      loadNsRecords(apex, apiToken)
-        .then((nsList) => renderList(els.nsList, els.nsEmpty, nsList, (value) => value.replace(/\.$/, "")))
+      loadNsRecords(apex)
+        .then((nsList) => renderList(els.nsList, els.nsEmpty, nsList, (record) => {
+          const cleanValue = record.value.replace(/\.$/, "");
+          return formatDnsRecord({ ...record, value: cleanValue });
+        }))
         .catch((error) => {
           renderList(els.nsList, els.nsEmpty, []);
           showError(error.message);
@@ -108,9 +121,29 @@ function loadDomainDetails(hostname, apiToken) {
     });
 }
 
+function setupRefresh() {
+  if (!els.refreshDns) return;
+
+  els.refreshDns.addEventListener("click", () => {
+    if (!currentHostname) return;
+
+    els.refreshDns.disabled = true;
+    renderList(els.aList, els.aEmpty, []);
+    renderList(els.nsList, els.nsEmpty, []);
+    setIpInfoMessage("Refreshing DNS...");
+    loadAddressRecords(currentHostname, currentApiToken);
+    loadDomainDetails(currentHostname);
+
+    setTimeout(() => {
+      els.refreshDns.disabled = false;
+    }, 1200);
+  });
+}
+
 async function run() {
   clearError();
   setupSettings();
+  setupRefresh();
 
   const settings = await loadSettings();
   const url = await getActiveTabUrl();
@@ -122,9 +155,11 @@ async function run() {
   }
 
   const apiToken = settings.api_token || "";
+  currentHostname = hostname;
+  currentApiToken = apiToken;
   initializePlaceholders(hostname);
   loadAddressRecords(hostname, apiToken);
-  loadDomainDetails(hostname, apiToken);
+  loadDomainDetails(hostname);
 }
 
 run().catch((error) => showError(error instanceof Error ? error.message : String(error)));

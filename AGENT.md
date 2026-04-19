@@ -33,8 +33,9 @@ Design decisions:
 - Manifest V3 keeps permissions explicit and narrow.
 - The popup uses `type="module"` so implementation can be split without a bundler.
 - Network work runs progressively instead of blocking the entire popup.
-- `host.io` and `ipinfo.io` are optional token-backed integrations.
-- Cloudflare DNS-over-HTTPS and RDAP remain the primary public fallback paths.
+- DNS lookups use live DNS-over-HTTPS resolver queries rather than host.io cached API data.
+- IPinfo remains an optional token-backed enrichment integration.
+- Cloudflare DNS-over-HTTPS is the primary DNS path, Google DNS-over-HTTPS is the fallback, and RDAP remains the domain-registration path.
 - DOM rendering uses `textContent` and `replaceChildren()` rather than HTML string injection.
 - Storage access is wrapped behind helpers to support `chrome.storage.sync`, `chrome.storage.local`, and local storage fallback.
 
@@ -56,7 +57,7 @@ Runtime files:
 - `src/dom.js`: DOM element lookup helpers.
 - `src/render.js`: text-safe render helpers, list rendering, errors, and placeholders.
 - `src/storage.js`: extension storage and active-tab URL access wrappers.
-- `src/api.js`: Cloudflare DoH, RDAP, host.io, and IPinfo API helpers.
+- `src/api.js`: DNS-over-HTTPS, RDAP, and IPinfo API helpers.
 - `src/domain.js`: hostname parsing, `A` record lookup, apex/delegation detection, and NS lookup.
 
 Key patterns:
@@ -71,15 +72,15 @@ Key patterns:
 
 Integrations:
 
-- `https://cloudflare-dns.com/dns-query`: DNS-over-HTTPS fallback for `A` and `NS`.
+- `https://cloudflare-dns.com/dns-query`: primary DNS-over-HTTPS resolver for `A` and `NS`.
+- `https://dns.google/resolve`: secondary DNS-over-HTTPS resolver for `A` and `NS`.
 - `https://rdap.org/domain/`: RDAP domain status, expiry, and registrar details.
-- `https://host.io/api/dns/`: optional token-backed DNS source.
 - `https://ipinfo.io/`: optional IP enrichment for `A[0]`.
 
 Security notes:
 
-- API token is user-provided and stored in extension storage with local fallback.
-- Token use is limited to host.io and IPinfo calls.
+- IPinfo token is user-provided and stored in extension storage with local fallback.
+- Token use is limited to IPinfo calls.
 - The popup never injects API responses as HTML.
 - Host permissions are limited to the APIs currently used.
 - No remote scripts, eval, background scripts, or content scripts are used.
@@ -97,10 +98,21 @@ Security notes:
 - Established `AGENT.md` as the repository source of truth.
 - Added `AGENT.TODO.md` for future improvements and hardening ideas.
 
+2026-04-19 realtime DNS update:
+
+- Removed host.io from DNS resolution to avoid stale API-backed DNS data.
+- Added Google DNS-over-HTTPS as a fallback resolver.
+- Added no-store DNS fetch options and per-query cache busters to avoid browser-level stale responses.
+- Added visible DNS TTL and resolver labels for `A` and `NS` results.
+- Added a popup Refresh button to re-run live DNS and domain lookups while the popup is open.
+- Updated saved IPinfo tokens immediately in the active popup session so Refresh uses the latest token.
+- Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
+- Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
+
 Earlier baseline:
 
 - Implemented popup UI for current hostname, domain status, expiry, registrar, nameservers, `A` records, and IP info.
-- Added shared settings token for IPinfo and host.io.
+- Added settings token support for optional IPinfo enrichment.
 - Added fallback behavior for optional token/API failures.
 
 ## Operational Notes
@@ -121,6 +133,7 @@ Constraints:
 Known issues:
 
 - Apex/registrable detection is DNS-based and best-effort. It does not use the Public Suffix List, so unusual TLD rules may be imperfect.
+- DNS answers are as fresh as the selected recursive resolver allows. Authoritative direct DNS is not possible from the browser popup because Chrome extensions cannot use Node's `dns` module or UDP sockets.
 - IP enrichment depends on a valid user token and only runs for the first `A` record.
 - There is no automated browser test harness yet.
 

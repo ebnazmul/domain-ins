@@ -40,6 +40,11 @@ header {
   justify-content: space-between;
   gap: 8px;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 h1 {
   margin: 0;
   font-size: 18px;
@@ -191,6 +196,17 @@ button:hover {
 button:disabled {
   opacity: 0.7;
   cursor: default;
+}
+.icon-button {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--accent);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+}
+.icon-button:hover {
+  background: #eef7ff;
 }
 
 .settings-menu {

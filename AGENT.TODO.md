@@ -7,6 +7,7 @@ Future improvements and hardening ideas. Keep this list practical and update it 
 - Add a lightweight browser smoke-test checklist or Playwright-based extension test when the project gains a test runner.
 - Add timeout handling for third-party API calls so slow endpoints cannot leave sections loading indefinitely.
 - Consider caching recent lookups in extension storage with short TTLs to reduce repeated network calls.
+- Consider an optional backend or native-helper mode for authoritative DNS queries if resolver-level DoH freshness is not enough.
 
 ## Domain Accuracy
 
@@ -15,7 +16,6 @@ Future improvements and hardening ideas. Keep this list practical and update it 
 
 ## Security
 
-- Consider separating host.io and IPinfo tokens if users commonly use different credentials.
 - Review whether IPinfo token can use an authorization header instead of query parameters without breaking the API.
 - Add clear user-facing copy explaining where the token is stored and which services receive it.
 

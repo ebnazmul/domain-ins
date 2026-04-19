@@ -10,23 +10,28 @@
     <header>
       <div class="header-row">
         <h1>Domain Insight</h1>
-        <details class="settings-menu">
-          <summary id="settings-toggle" aria-label="Settings" title="Settings">
-            <span class="gear" aria-hidden="true">&#9881;</span>
-          </summary>
-          <div class="settings-panel">
-            <form id="settings-form">
-              <label class="field" for="api-token">
-                <span>API Token (IPinfo / host.io)</span>
-                <input id="api-token" type="password" placeholder="Enter IPinfo or host.io token" autocomplete="off" />
-              </label>
-              <div class="settings-actions">
-                <button id="save-token" type="submit">Save</button>
-                <span id="token-status" class="token-status hidden">Saved</span>
-              </div>
-            </form>
-          </div>
-        </details>
+        <div class="header-actions">
+          <button id="refresh-dns" class="icon-button" type="button" title="Refresh DNS now" aria-label="Refresh DNS now">
+            Refresh
+          </button>
+          <details class="settings-menu">
+            <summary id="settings-toggle" aria-label="Settings" title="Settings">
+              <span class="gear" aria-hidden="true">&#9881;</span>
+            </summary>
+            <div class="settings-panel">
+              <form id="settings-form">
+                <label class="field" for="api-token">
+                  <span>IPinfo Token</span>
+                  <input id="api-token" type="password" placeholder="Enter IPinfo token" autocomplete="off" />
+                </label>
+                <div class="settings-actions">
+                  <button id="save-token" type="submit">Save</button>
+                  <span id="token-status" class="token-status hidden">Saved</span>
+                </div>
+              </form>
+            </div>
+          </details>
+        </div>
       </div>
     </header>
 

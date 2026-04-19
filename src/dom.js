@@ -16,6 +16,7 @@ export const els = {
   settingsForm: document.getElementById("settings-form"),
   saveToken: document.getElementById("save-token"),
   tokenStatus: document.getElementById("token-status"),
+  refreshDns: document.getElementById("refresh-dns"),
   error: document.getElementById("error")
 };
 

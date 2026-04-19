@@ -95,7 +95,7 @@ export async function loadSettings() {
     try {
       const stored = await storageGet(area, keys);
       const legacy = await storageGet(area, LEGACY_TOKEN_KEYS);
-      const mergedToken = stored?.api_token || legacy?.hostio_token || legacy?.ipinfo_token || "";
+      const mergedToken = stored?.api_token || legacy?.ipinfo_token || "";
 
       for (const field of SETTINGS_FIELDS) {
         const input = settingsInputs[field.key];
@@ -131,8 +131,7 @@ export async function saveSettings() {
     try {
       await storageSet(area, {
         api_token: payload.api_token,
-        ipinfo_token: payload.api_token,
-        hostio_token: payload.api_token
+        ipinfo_token: payload.api_token
       });
       saved = true;
     } catch (error) {
