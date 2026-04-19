@@ -44,7 +44,9 @@ export async function findApex(hostname) {
 
 export async function loadNsRecords(apex) {
   const json = await doh(apex, "NS");
-  return answersOfType(json, 2).map((answer) => normalizeDnsRecord(answer, json.resolver));
+  return answersOfType(json, 2)
+    .map((answer) => normalizeDnsRecord(answer, json.resolver))
+    .sort(compareDnsRecordValues);
 }
 
 function normalizeDnsRecord(answer, resolver) {
@@ -53,4 +55,11 @@ function normalizeDnsRecord(answer, resolver) {
     ttl: Number.isFinite(answer.TTL) ? answer.TTL : null,
     resolver
   };
+}
+
+function compareDnsRecordValues(a, b) {
+  return a.value.localeCompare(b.value, undefined, {
+    numeric: true,
+    sensitivity: "base"
+  });
 }
