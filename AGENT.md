@@ -1,65 +1,140 @@
 # AGENT.md
 
-Purpose: keep work on this extension focused, fast, and maintainable.
+This file is the repository source of truth. Keep it current after every meaningful code, architecture, documentation, or operations change.
 
-## Project Scope
+## Project Overview
 
-This extension is for quick domain inspection from the current browser tab.
+Domain Insight is a Chrome Manifest V3 extension for quick domain inspection from the active browser tab.
+
+Objectives:
+
+- Show useful hostname, DNS, RDAP, and IP information in a compact popup.
+- Render progressively so the popup remains useful even when secondary network calls fail.
+- Keep the implementation static, dependency-free, and easy to load as an unpacked extension.
+- Preserve safe defaults, minimal permissions, and clear failure states.
 
 Current popup scope:
 
-- current domain
-- registrable domain
-- domain status
-- expiry with days left and date
-- registrar
-- nameservers
-- hostname `A` records
-- IP info for `A[0]`
+- Current hostname
+- Best-effort registrable or delegated domain
+- Domain status
+- Expiry with days left and date
+- Registrar
+- Nameservers
+- Hostname `A` records
+- IP info for the first `A` record
 
-## Priorities
+## Architecture
 
-1. Speed
-2. Clear UI
-3. Useful domain data
-4. Minimal complexity
+The extension is intentionally simple: static HTML, CSS, and ES modules. There is no build step, backend, package manager, background script, or content script.
 
-Do not add features that make the popup slower unless they add clear value.
+Design decisions:
 
-## Working Rules
+- Manifest V3 keeps permissions explicit and narrow.
+- The popup uses `type="module"` so implementation can be split without a bundler.
+- Network work runs progressively instead of blocking the entire popup.
+- `host.io` and `ipinfo.io` are optional token-backed integrations.
+- Cloudflare DNS-over-HTTPS and RDAP remain the primary public fallback paths.
+- DOM rendering uses `textContent` and `replaceChildren()` rather than HTML string injection.
+- Storage access is wrapped behind helpers to support `chrome.storage.sync`, `chrome.storage.local`, and local storage fallback.
 
-- Prefer progressive rendering over waiting for everything.
-- Do not block the popup just to finish secondary lookups.
-- Keep network calls limited and intentional.
-- Prefer fallback behavior over hard failure.
-- If an API fails, keep the rest of the popup usable.
+Rationale:
 
-## Code Rules
+- Small focused modules reduce accidental coupling without adding framework complexity.
+- Keeping all logic in the popup avoids long-lived extension processes and keeps the permission surface small.
+- Defensive fallbacks make the tool usable when optional APIs, tokens, or RDAP responses fail.
 
-- Keep the code in plain JavaScript.
-- Avoid unnecessary abstraction.
-- Reuse helpers when it reduces duplication.
-- Keep DOM updates simple and explicit.
-- Keep `manifest.json` permissions as small as possible for the current feature set.
-- When behavior changes, update `README.md`.
+## Implementation Details
 
-## API Rules
+Runtime files:
 
-- Cloudflare DoH is the default DNS fallback.
-- `host.io` is optional and should not break the popup if unavailable.
-- `ipinfo.io` is optional and should only enrich `A[0]`.
-- RDAP failures should degrade gracefully.
+- `manifest.json`: extension metadata, popup entry, permissions, host permissions.
+- `popup.html`: popup structure and settings form.
+- `styles.css`: compact light UI styling.
+- `popup.js`: startup orchestration and progressive loading flow.
+- `src/config.js`: API endpoint constants and settings key definitions.
+- `src/dom.js`: DOM element lookup helpers.
+- `src/render.js`: text-safe render helpers, list rendering, errors, and placeholders.
+- `src/storage.js`: extension storage and active-tab URL access wrappers.
+- `src/api.js`: Cloudflare DoH, RDAP, host.io, and IPinfo API helpers.
+- `src/domain.js`: hostname parsing, `A` record lookup, apex/delegation detection, and NS lookup.
 
-## UI Rules
+Key patterns:
 
-- Keep the popup compact.
-- Keep the important values easy to scan.
-- Avoid visual clutter.
-- Avoid adding decorative UI that hurts readability.
+- Use plain JavaScript modules only.
+- Keep API clients focused on fetching and response normalization.
+- Keep DOM updates explicit and text-only.
+- Prefer graceful degradation over hard failure.
+- Avoid adding new permissions unless a feature requires them.
+- Update `README.md` when user-facing behavior changes.
+- Add future work to `AGENT.TODO.md`; do not hide roadmap items in code comments.
 
-## Do Not
+Integrations:
 
-- Do not turn the popup into a dashboard.
-- Do not add background scripts or extra architecture unless necessary.
-- Do not add new record types or extra services unless explicitly requested.
-- Do not sacrifice readability for color or effects.
+- `https://cloudflare-dns.com/dns-query`: DNS-over-HTTPS fallback for `A` and `NS`.
+- `https://rdap.org/domain/`: RDAP domain status, expiry, and registrar details.
+- `https://host.io/api/dns/`: optional token-backed DNS source.
+- `https://ipinfo.io/`: optional IP enrichment for `A[0]`.
+
+Security notes:
+
+- API token is user-provided and stored in extension storage with local fallback.
+- Token use is limited to host.io and IPinfo calls.
+- The popup never injects API responses as HTML.
+- Host permissions are limited to the APIs currently used.
+- No remote scripts, eval, background scripts, or content scripts are used.
+
+## Progress Updates
+
+2026-04-19:
+
+- Fixed corrupted visible text by replacing mojibake labels with stable ASCII copy.
+- Converted `popup.js` from a monolithic file into focused ES modules under `src/`.
+- Added defensive Chrome API access through `globalThis.chrome`.
+- Replaced list `innerHTML` clearing with `replaceChildren()`.
+- Updated manifest description to match the full domain-inspection scope.
+- Allowed vertical popup scrolling so content is not clipped in constrained viewports.
+- Established `AGENT.md` as the repository source of truth.
+- Added `AGENT.TODO.md` for future improvements and hardening ideas.
+
+Earlier baseline:
+
+- Implemented popup UI for current hostname, domain status, expiry, registrar, nameservers, `A` records, and IP info.
+- Added shared settings token for IPinfo and host.io.
+- Added fallback behavior for optional token/API failures.
+
+## Operational Notes
+
+Deployment:
+
+- Load manually through `chrome://extensions` with Developer mode and `Load unpacked`.
+- Select the repository folder.
+- Reload the extension after file changes.
+
+Constraints:
+
+- No build step exists; code must run directly in Chrome as shipped.
+- Keep files browser-compatible and avoid Node-only APIs.
+- Network access depends on Chrome host permissions in `manifest.json`.
+- The active tab must have a normal URL with a hostname; Chrome internal pages are unsupported.
+
+Known issues:
+
+- Apex/registrable detection is DNS-based and best-effort. It does not use the Public Suffix List, so unusual TLD rules may be imperfect.
+- IP enrichment depends on a valid user token and only runs for the first `A` record.
+- There is no automated browser test harness yet.
+
+Change management:
+
+- After every meaningful change, update `AGENT.md`.
+- Add new ideas and improvements to `AGENT.TODO.md`.
+- Commit the changes.
+- Push the commit to GitHub.
+
+Engineering principles:
+
+- Prefer simple, practical solutions.
+- Avoid over-engineering.
+- Follow modern security best practices.
+- Use safe defaults.
+- Design for scalability and long-term maintainability.

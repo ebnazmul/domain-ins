@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Domain Insight",
-  "description": "Show A records for the current tab's hostname using Cloudflare DNS-over-HTTPS.",
+  "description": "Show domain, DNS, RDAP, and IP details for the current tab.",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
