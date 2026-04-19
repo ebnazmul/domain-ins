@@ -18,16 +18,14 @@ function setupContextMenu() {
   });
 }
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId !== DNSLT_CONTEXT_MENU_ID) return;
+chrome.contextMenus.onClicked.addListener((info) => {
+  if (!info || info.menuItemId !== DNSLT_CONTEXT_MENU_ID) return;
 
   const target = normalizeSelectedTarget(info.selectionText || "");
 
   if (!target) return;
 
-  chrome.tabs.create({
-    url: `${DNSLT_BASE_URL}${target.type}/${encodeURIComponent(target.value)}`
-  });
+  openDnsltTarget(target);
 });
 
 function normalizeSelectedTarget(value) {
@@ -61,4 +59,14 @@ function hostnameFromUrl(value) {
   } catch {
     return "";
   }
+}
+
+function openDnsltTarget(target) {
+  const url = `${DNSLT_BASE_URL}${target.type}/${encodeURIComponent(target.value)}`;
+
+  if (!chrome.tabs?.create) {
+    return;
+  }
+
+  chrome.tabs.create({ url });
 }

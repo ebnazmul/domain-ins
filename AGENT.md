@@ -116,6 +116,7 @@ Security notes:
 - Added a Chrome right-click context menu for selected domain/IPv4 text that opens the matching DNSLT domain or IP route.
 - Hardened context-menu registration by recreating it on service-worker load, install, and browser startup.
 - Removed reliance on `chrome.contextMenus.onShown` because some Chrome runtimes do not expose it and fail service-worker registration.
+- Added defensive guards around context-menu click payloads and tab creation to prevent service-worker crashes.
 - Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
 - Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
 
