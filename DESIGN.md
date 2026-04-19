@@ -1,85 +1,74 @@
 # DESIGN.md
 
-Purpose: keep the extension visually consistent.
+Purpose: keep the popup consistent and readable.
 
 ## Design Direction
 
-- Clean, light, compact UI.
-- Fast to scan.
-- Low visual noise.
-- Use color for emphasis, not decoration.
-- Prefer clarity over novelty.
+- light UI
+- compact layout
+- fast to scan
+- minimal but not plain
+- colorful in a controlled way
+- readability first
 
 ## Palette
 
-- `--color-sand: #DEDAC7`
-- `--color-violet: #746AE1`
-- `--color-blue: #279EE1`
-- `--color-mint: #45E097`
-- `--color-purple: #6A31E1`
-- `--color-sky: #90BDE0`
+- sand: `#DEDAC7`
+- violet: `#746AE1`
+- blue: `#279EE1`
+- mint: `#45E097`
+- purple: `#6A31E1`
+- sky: `#90BDE0`
 
-## Usage Rules
+## Color Usage
 
-- Primary action or highlight: `#279EE1`
-- Secondary accent: `#746AE1`
-- Success or positive state: `#45E097`
-- Supporting accent or stronger emphasis: `#6A31E1`
-- Soft surfaces or subtle backgrounds: `#DEDAC7`
-- Cool muted panels or borders: `#90BDE0`
+- primary actions: blue
+- secondary accent: violet
+- strong heading accent: purple
+- positive state: mint
+- borders and cool UI lines: sky
+- soft background tint: sand
 
-## UI Rules
-
-- Use a light background.
-- Keep cards and panels simple.
-- Use rounded corners consistently.
-- Keep spacing tight and even.
-- Avoid crowded layouts.
-- Avoid too many accent colors in the same view.
+Do not use all accent colors equally in the same view.
 
 ## Typography
 
-- Use a clean sans-serif stack.
-- Headings should be clear and slightly bold.
-- Body text should stay compact and readable.
-- Monospace is allowed for DNS values, IPs, and technical data only.
+- preferred heading stack: `Inter Display`, `Inter`, sans-serif
+- preferred body stack: `Inter`, sans-serif
+- use monospace only for technical values like DNS and ASN
+- keep labels readable, not tiny
+- do not use low-contrast muted text for important values
 
-## Component Rules
+## Layout Rules
 
-- Status and key info should appear near the top.
-- Lists of technical values should use pills or compact rows.
-- Errors should be visible but not oversized.
-- Empty states should be short and neutral.
+- use small cards or panels
+- keep spacing tight but not crowded
+- important values should appear near the top
+- technical lists should be chips or compact rows
+- settings should stay in a small top-right menu
 
-## CSS Guidance
+## Accessibility Rules
 
-Prefer CSS variables with these names:
+- text must stay readable on all backgrounds
+- contrast matters more than decoration
+- avoid overly transparent surfaces
+- avoid gradients behind dense text blocks
+- focus states must stay visible
 
-- `--bg`
-- `--surface`
-- `--text`
-- `--muted`
-- `--border`
-- `--primary`
-- `--secondary`
-- `--success`
-- `--accent-strong`
+## Visual Boundaries
 
-Suggested mapping:
+- rounded corners are fine
+- subtle shadows are fine
+- avoid heavy glassmorphism
+- avoid noisy gradients
+- avoid too many emojis in text-heavy rows
 
-- `--bg: #ffffff`
-- `--surface: #DEDAC7`
-- `--text: #1f2430`
-- `--muted: #5f6b7a`
-- `--border: #90BDE0`
-- `--primary: #279EE1`
-- `--secondary: #746AE1`
-- `--success: #45E097`
-- `--accent-strong: #6A31E1`
+## Current UI Intent
 
-## Do Not
+The popup should feel like a small utility card:
 
-- Do not mix unrelated color themes.
-- Do not add dark mode unless requested.
-- Do not use heavy gradients by default.
-- Do not make the popup feel like a dashboard.
+- quick to open
+- quick to read
+- slightly colorful
+- technically clean
+- not playful at the cost of clarity

@@ -329,7 +329,14 @@ async function findApex(hostname) {
     return { apex: hostname, nsList: [] };
   }
 
-  const candidates = labels.slice(0, -1).map((_, index) => labels.slice(index).join("."));
+  if (labels.length === 2) {
+    return { apex: hostname, nsList: [] };
+  }
+
+  const candidates = labels
+    .slice(0, -2)
+    .map((_, index) => labels.slice(index).join("."))
+    .concat(labels.slice(-2).join("."));
   const results = await Promise.all(
     candidates.map(async (candidate) => {
       try {
@@ -394,6 +401,14 @@ async function fetchDomainStatus(apexDomain) {
   });
 
   if (!response.ok) {
+    if (response.status === 404) {
+      return {
+        status: "Unavailable",
+        expiry: "Unavailable",
+        registrar: "Unavailable"
+      };
+    }
+
     throw new Error(`RDAP lookup failed (${response.status})`);
   }
 

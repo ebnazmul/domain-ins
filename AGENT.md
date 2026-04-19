@@ -1,53 +1,65 @@
 # AGENT.md
 
-Purpose: keep future work fast, consistent, and low-token.
+Purpose: keep work on this extension focused, fast, and maintainable.
 
-## Working Style
+## Project Scope
 
-- Be concise.
-- Do the work directly instead of explaining obvious steps.
-- Ask questions only when blocked or when a choice is risky.
-- Prefer short summaries over long explanations.
-- Minimize token usage in plans, updates, and final responses.
+This extension is for quick domain inspection from the current browser tab.
 
-## Product Priorities
+Current popup scope:
 
-- Speed is more important than adding extra features.
-- Keep the extension focused and lightweight.
-- Avoid broad feature creep.
-- Remove low-value features if they slow down the popup.
-- Default to the smallest useful implementation.
+- current domain
+- registrable domain
+- domain status
+- expiry with days left and date
+- registrar
+- nameservers
+- hostname `A` records
+- IP info for `A[0]`
 
-## Current Scope
+## Priorities
 
-- Main job: show `A` records for the current tab hostname.
-- Do not add MX, RDAP, registrar, expiry, reverse DNS, IP enrichment, or other lookups unless explicitly requested.
-- Prefer one network request when possible.
-- Avoid sequential request chains.
-- Avoid storage, background complexity, or extra permissions unless necessary.
+1. Speed
+2. Clear UI
+3. Useful domain data
+4. Minimal complexity
 
-## Code Preferences
+Do not add features that make the popup slower unless they add clear value.
 
-- Keep files simple and readable.
-- Prefer plain JavaScript and minimal DOM work.
-- Avoid unnecessary abstractions.
-- Avoid duplicate async calls.
-- Keep permissions minimal in `manifest.json`.
-- When changing scope, also update `README.md`.
+## Working Rules
 
-## Response Preferences
+- Prefer progressive rendering over waiting for everything.
+- Do not block the popup just to finish secondary lookups.
+- Keep network calls limited and intentional.
+- Prefer fallback behavior over hard failure.
+- If an API fails, keep the rest of the popup usable.
 
-- Use short direct language.
-- No fluff.
-- No long changelog-style writeups unless requested.
-- For reviews: lead with concrete problems and performance risks.
+## Code Rules
 
-## Change Rule
+- Keep the code in plain JavaScript.
+- Avoid unnecessary abstraction.
+- Reuse helpers when it reduces duplication.
+- Keep DOM updates simple and explicit.
+- Keep `manifest.json` permissions as small as possible for the current feature set.
+- When behavior changes, update `README.md`.
 
-Before adding anything, check:
+## API Rules
 
-1. Does this make the popup slower?
-2. Does this add clear value?
-3. Can this be done in a simpler way?
+- Cloudflare DoH is the default DNS fallback.
+- `host.io` is optional and should not break the popup if unavailable.
+- `ipinfo.io` is optional and should only enrich `A[0]`.
+- RDAP failures should degrade gracefully.
 
-If the answer is weak, do not add it.
+## UI Rules
+
+- Keep the popup compact.
+- Keep the important values easy to scan.
+- Avoid visual clutter.
+- Avoid adding decorative UI that hurts readability.
+
+## Do Not
+
+- Do not turn the popup into a dashboard.
+- Do not add background scripts or extra architecture unless necessary.
+- Do not add new record types or extra services unless explicitly requested.
+- Do not sacrifice readability for color or effects.
