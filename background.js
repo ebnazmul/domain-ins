@@ -18,13 +18,13 @@ function setupContextMenu() {
   });
 }
 
-chrome.contextMenus.onClicked.addListener((info) => {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (!info || info.menuItemId !== DNSLT_CONTEXT_MENU_ID) return;
 
   const target = normalizeSelectedTarget(info.selectionText || "");
 
   if (!target) {
-    showInvalidSelectionMessage();
+    showInvalidSelectionTooltip(tab?.id);
     return;
   }
 
@@ -74,17 +74,44 @@ function openDnsltTarget(target) {
   chrome.tabs.create({ url });
 }
 
-function showInvalidSelectionMessage() {
-  if (!chrome.notifications?.create) {
+function showInvalidSelectionTooltip(tabId) {
+  if (!tabId || !chrome.scripting?.executeScript) {
     return;
   }
 
-  chrome.notifications.create({
-    type: "basic",
-    iconUrl: chrome.runtime.getURL("icon.svg"),
-    title: "DNSLT",
-    message: "Select a valid domain or IPv4 address."
+  chrome.scripting.executeScript({
+    target: { tabId },
+    func: showDnsltTooltip,
+    args: ["Select a valid domain or IPv4 address."]
   }, () => {
     void chrome.runtime.lastError;
   });
+}
+
+function showDnsltTooltip(message) {
+  const existing = document.getElementById("domain-insight-dnslt-tooltip");
+  if (existing) {
+    existing.remove();
+  }
+
+  const tooltip = document.createElement("div");
+  tooltip.id = "domain-insight-dnslt-tooltip";
+  tooltip.textContent = message;
+  tooltip.style.cssText = [
+    "position:fixed",
+    "z-index:2147483647",
+    "top:16px",
+    "right:16px",
+    "max-width:320px",
+    "padding:10px 12px",
+    "border-radius:12px",
+    "background:#101828",
+    "color:#ffffff",
+    "font:600 13px/1.4 system-ui,-apple-system,Segoe UI,sans-serif",
+    "box-shadow:0 10px 30px rgba(16,24,40,.24)",
+    "pointer-events:none"
+  ].join(";");
+
+  document.documentElement.appendChild(tooltip);
+  setTimeout(() => tooltip.remove(), 2400);
 }
