@@ -108,6 +108,7 @@ Security notes:
 - Added a popup Refresh button to re-run live DNS and domain lookups while the popup is open.
 - Updated saved IPinfo tokens immediately in the active popup session so Refresh uses the latest token.
 - Sorted nameserver records with natural ordering so `ns1` appears before `ns2` and `ns10`.
+- Made `A` record chips link to `https://ipinfo.io/{ip}` in a new tab with `noopener noreferrer`.
 - Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
 - Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
 

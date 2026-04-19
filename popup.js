@@ -49,10 +49,17 @@ function formatDnsRecord(record) {
   return `${record.value} (${ttl}, ${resolver})`;
 }
 
+function formatAddressRecordLink(record) {
+  return {
+    href: `https://ipinfo.io/${encodeURIComponent(record.value)}`,
+    label: formatDnsRecord(record)
+  };
+}
+
 function loadAddressRecords(hostname, apiToken) {
   fetchARecords(hostname)
     .then((records) => {
-      renderList(els.aList, els.aEmpty, records, formatDnsRecord);
+      renderList(els.aList, els.aEmpty, records, formatAddressRecordLink);
 
       const firstIp = records[0]?.value;
       if (!firstIp) {

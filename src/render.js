@@ -50,12 +50,25 @@ export function renderList(listEl, emptyEl, values, transform) {
   const fragment = document.createDocumentFragment();
   for (const value of normalized) {
     const li = document.createElement("li");
-    li.textContent = value;
+    if (isLinkValue(value)) {
+      const link = document.createElement("a");
+      link.href = value.href;
+      link.textContent = value.label;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      li.appendChild(link);
+    } else {
+      li.textContent = value;
+    }
     fragment.appendChild(li);
   }
 
   listEl.appendChild(fragment);
   emptyEl?.classList.add("hidden");
+}
+
+function isLinkValue(value) {
+  return Boolean(value && typeof value === "object" && value.href && value.label);
 }
 
 export function initializePlaceholders(hostname) {
