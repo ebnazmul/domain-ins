@@ -1,8 +1,7 @@
 const DNSLT_CONTEXT_MENU_ID = "open-dnslt-domain";
-const DNSLT_BASE_URL = "https://dnslt.com/";
+const DNSLT_BASE_URL = "https://www.dnslt.com/";
 const DOMAIN_PATTERN = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
 const IPV4_PATTERN = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
-const IPV6_PATTERN = /^(?:[a-f0-9]{1,4}:){2,}[a-f0-9:]{1,}$/i;
 
 setupContextMenu();
 
@@ -24,7 +23,7 @@ chrome.contextMenus.onShown.addListener((info) => {
   const target = normalizeSelectedTarget(info.selectionText || "");
 
   chrome.contextMenus.update(DNSLT_CONTEXT_MENU_ID, {
-    title: target ? `Open ${target} in DNSLT` : "Open in DNSLT",
+    title: target ? `Open ${target.value} in DNSLT` : "Open in DNSLT",
     visible: Boolean(target)
   });
   chrome.contextMenus.refresh();
@@ -38,7 +37,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (!target) return;
 
   chrome.tabs.create({
-    url: `${DNSLT_BASE_URL}${encodeURIComponent(target)}`
+    url: `${DNSLT_BASE_URL}${target.type}/${encodeURIComponent(target.value)}`
   });
 });
 
@@ -49,11 +48,15 @@ function normalizeSelectedTarget(value) {
   const fromUrl = hostnameFromUrl(cleaned);
   const candidate = fromUrl || cleaned.replace(/\.$/, "");
 
-  if (isValidDnsltTarget(candidate)) {
-    return candidate.toLowerCase();
+  if (IPV4_PATTERN.test(candidate)) {
+    return { type: "ip", value: candidate };
   }
 
-  return "";
+  if (DOMAIN_PATTERN.test(candidate)) {
+    return { type: "domain", value: candidate.toLowerCase() };
+  }
+
+  return null;
 }
 
 function cleanSelectedText(value) {
@@ -69,8 +72,4 @@ function hostnameFromUrl(value) {
   } catch {
     return "";
   }
-}
-
-function isValidDnsltTarget(value) {
-  return DOMAIN_PATTERN.test(value) || IPV4_PATTERN.test(value) || IPV6_PATTERN.test(value);
 }
