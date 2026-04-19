@@ -90,6 +90,7 @@ Security notes:
 2026-04-19:
 
 - Fixed corrupted visible text by replacing mojibake labels with stable ASCII copy.
+- Restored clean UTF-8 emoji labels in the popup and README after the encoding issue was resolved.
 - Converted `popup.js` from a monolithic file into focused ES modules under `src/`.
 - Added defensive Chrome API access through `globalThis.chrome`.
 - Replaced list `innerHTML` clearing with `replaceChildren()`.

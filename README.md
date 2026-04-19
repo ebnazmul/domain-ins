@@ -1,33 +1,33 @@
-# Domain Insight
+# 🌐 Domain Insight
 
 Domain Insight is a Chrome extension that shows quick domain and network details for the current tab.
 
 It focuses on fast popup startup, progressive rendering, and useful hostname checks without a backend service.
 
-## What It Shows
+## ✨ What It Shows
 
-- Current hostname
-- Best-effort registrable or delegated domain
-- Domain status from RDAP
-- Expiry with remaining days and date
-- Registrar
-- Nameservers
-- `A` records for the current hostname
-- IP information for the first `A` record:
+- 🏷️ Current hostname
+- 🔗 Best-effort registrable or delegated domain
+- 🛡️ Domain status from RDAP
+- ⏳ Expiry with remaining days and date
+- 🏢 Registrar
+- 🧭 Nameservers
+- 📡 `A` records for the current hostname
+- 📍 IP information for the first `A` record:
   - IP
   - Org
   - Company
   - ASN
   - Location
 
-## Data Sources
+## ⚙️ Data Sources
 
 - `cloudflare-dns.com` for DNS-over-HTTPS fallback lookups
 - `rdap.org` for domain registration details
 - `ipinfo.io` as optional enrichment for the first `A` record
 - `dns.google` as a secondary DNS-over-HTTPS resolver if Cloudflare fails
 
-## API Token
+## 🔑 API Token
 
 The popup has a top-right settings menu. You can save one token:
 
@@ -43,7 +43,7 @@ If the token is missing or invalid:
 - DNS and RDAP still work through public fallbacks.
 - The IP info area may show unavailable or token-related messages.
 
-## Load the Extension
+## 🚀 Load the Extension
 
 1. Open `chrome://extensions`.
 2. Enable `Developer mode`.
@@ -51,7 +51,7 @@ If the token is missing or invalid:
 4. Select this folder.
 5. Open the extension popup on a normal website tab.
 
-## Current Files
+## 🧩 Current Files
 
 - `manifest.json`
 - `popup.html`
@@ -67,7 +67,7 @@ If the token is missing or invalid:
 - `AGENT.TODO.md`
 - `DESIGN.md`
 
-## Permissions
+## 🛠️ Permissions
 
 - `activeTab`
 - `tabs`
@@ -80,7 +80,7 @@ Host permissions:
 - `https://rdap.org/*`
 - `https://ipinfo.io/*`
 
-## Notes
+## 📌 Notes
 
 - The popup renders progressively.
 - Main domain details appear first.
@@ -90,7 +90,7 @@ Host permissions:
 - The Refresh button re-runs DNS and RDAP lookups for the active hostname while the popup is open.
 - `AGENT.md` is the repository source of truth for architecture, operational notes, and progress.
 
-## Troubleshooting
+## ⚠️ Troubleshooting
 
 ### Popup opens but no domain appears
 
@@ -108,6 +108,6 @@ Check that:
 - Your saved token is valid.
 - `ipinfo.io` is reachable.
 
-## Goal
+## 🎯 Goal
 
 Keep the extension lightweight, practical, secure by default, and fast enough for repeated popup use while still showing the important domain details.
