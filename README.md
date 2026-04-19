@@ -90,7 +90,7 @@ Host permissions:
 - Optional API failures degrade gracefully.
 - DNS records are fetched through live DNS-over-HTTPS queries with no-store fetch options and visible TTL values.
 - The Refresh button re-runs DNS and RDAP lookups for the active hostname while the popup is open.
-- The right-click context menu opens the clicked link or current page hostname on `dnslt.com`.
+- The right-click context menu appears for selected domain/IP text and opens it on `dnslt.com`.
 - `AGENT.md` is the repository source of truth for architecture, operational notes, and progress.
 
 ## ⚠️ Troubleshooting
