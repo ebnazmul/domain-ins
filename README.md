@@ -54,6 +54,7 @@ If the token is missing or invalid:
 ## 🧩 Current Files
 
 - `manifest.json`
+- `background.js`
 - `popup.html`
 - `popup.js`
 - `styles.css`
@@ -72,6 +73,7 @@ If the token is missing or invalid:
 - `activeTab`
 - `tabs`
 - `storage`
+- `contextMenus`
 
 Host permissions:
 
@@ -88,6 +90,7 @@ Host permissions:
 - Optional API failures degrade gracefully.
 - DNS records are fetched through live DNS-over-HTTPS queries with no-store fetch options and visible TTL values.
 - The Refresh button re-runs DNS and RDAP lookups for the active hostname while the popup is open.
+- The right-click context menu opens the clicked link or current page hostname on `dnslt.com`.
 - `AGENT.md` is the repository source of truth for architecture, operational notes, and progress.
 
 ## ⚠️ Troubleshooting

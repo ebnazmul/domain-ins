@@ -26,7 +26,7 @@ Current popup scope:
 
 ## Architecture
 
-The extension is intentionally simple: static HTML, CSS, and ES modules. There is no build step, backend, package manager, background script, or content script.
+The extension is intentionally simple: static HTML, CSS, ES modules, and one Manifest V3 service worker for the context menu. There is no build step, backend, package manager, or content script.
 
 Design decisions:
 
@@ -42,7 +42,8 @@ Design decisions:
 Rationale:
 
 - Small focused modules reduce accidental coupling without adding framework complexity.
-- Keeping all logic in the popup avoids long-lived extension processes and keeps the permission surface small.
+- Keeping inspection logic in the popup avoids long-lived extension processes and keeps the permission surface small.
+- The service worker is limited to registering and handling the DNSLT context-menu shortcut.
 - Defensive fallbacks make the tool usable when optional APIs, tokens, or RDAP responses fail.
 
 ## Implementation Details
@@ -50,6 +51,7 @@ Rationale:
 Runtime files:
 
 - `manifest.json`: extension metadata, popup entry, permissions, host permissions.
+- `background.js`: context menu registration and DNSLT redirect handling.
 - `popup.html`: popup structure and settings form.
 - `styles.css`: compact light UI styling.
 - `popup.js`: startup orchestration and progressive loading flow.
@@ -67,6 +69,7 @@ Key patterns:
 - Keep DOM updates explicit and text-only.
 - Prefer graceful degradation over hard failure.
 - Avoid adding new permissions unless a feature requires them.
+- Keep service-worker behavior narrowly scoped to extension actions that cannot run from the popup.
 - Update `README.md` when user-facing behavior changes.
 - Add future work to `AGENT.TODO.md`; do not hide roadmap items in code comments.
 
@@ -83,7 +86,8 @@ Security notes:
 - Token use is limited to IPinfo calls.
 - The popup never injects API responses as HTML.
 - Host permissions are limited to the APIs currently used.
-- No remote scripts, eval, background scripts, or content scripts are used.
+- No remote scripts, eval, or content scripts are used.
+- The context-menu service worker only parses URLs and opens `https://dnslt.com/{hostname}`.
 
 ## Progress Updates
 
@@ -109,6 +113,7 @@ Security notes:
 - Updated saved IPinfo tokens immediately in the active popup session so Refresh uses the latest token.
 - Sorted nameserver records with natural ordering so `ns1` appears before `ns2` and `ns10`.
 - Made `A` record chips link to `https://ipinfo.io/{ip}` in a new tab with `noopener noreferrer`.
+- Added a Chrome right-click context menu that opens the clicked link or page hostname at `https://dnslt.com/{hostname}`.
 - Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
 - Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
 
