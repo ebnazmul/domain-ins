@@ -10,7 +10,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["activeTab", "tabs", "storage", "contextMenus"],
+  "permissions": ["activeTab", "tabs", "storage", "contextMenus", "notifications"],
   "host_permissions": [
     "https://cloudflare-dns.com/*",
     "https://dns.google/*",

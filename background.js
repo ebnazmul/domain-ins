@@ -23,7 +23,10 @@ chrome.contextMenus.onClicked.addListener((info) => {
 
   const target = normalizeSelectedTarget(info.selectionText || "");
 
-  if (!target) return;
+  if (!target) {
+    showInvalidSelectionMessage();
+    return;
+  }
 
   openDnsltTarget(target);
 });
@@ -69,4 +72,19 @@ function openDnsltTarget(target) {
   }
 
   chrome.tabs.create({ url });
+}
+
+function showInvalidSelectionMessage() {
+  if (!chrome.notifications?.create) {
+    return;
+  }
+
+  chrome.notifications.create({
+    type: "basic",
+    iconUrl: chrome.runtime.getURL("icon.svg"),
+    title: "DNSLT",
+    message: "Select a valid domain or IPv4 address."
+  }, () => {
+    void chrome.runtime.lastError;
+  });
 }

@@ -52,6 +52,7 @@ Runtime files:
 
 - `manifest.json`: extension metadata, popup entry, permissions, host permissions.
 - `background.js`: context menu registration and DNSLT redirect handling.
+- `icon.svg`: local notification icon used by the background service worker.
 - `popup.html`: popup structure and settings form.
 - `styles.css`: compact light UI styling.
 - `popup.js`: startup orchestration and progressive loading flow.
@@ -117,6 +118,7 @@ Security notes:
 - Hardened context-menu registration by recreating it on service-worker load, install, and browser startup.
 - Removed reliance on `chrome.contextMenus.onShown` because some Chrome runtimes do not expose it and fail service-worker registration.
 - Added defensive guards around context-menu click payloads and tab creation to prevent service-worker crashes.
+- Added a simple notification when the DNSLT context-menu selection is not a valid domain or IPv4 address.
 - Removed `https://host.io/*` from host permissions and added `https://dns.google/*`.
 - Documented that Node's `dns` module cannot run inside a Chrome extension popup; direct DNS would require a backend or native helper.
 
