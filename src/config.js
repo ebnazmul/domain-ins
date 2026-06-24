@@ -11,9 +11,3 @@ export const DNS_RESOLVERS = [
     url: "https://dns.google/resolve"
   }
 ];
-
-export const SETTINGS_FIELDS = [
-  { key: "api_token", elementId: "api-token" }
-];
-
-export const LEGACY_TOKEN_KEYS = ["ipinfo_token"];

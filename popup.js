@@ -1,11 +1,12 @@
 import { fetchDomainStatus, fetchIpInfo } from "./src/api.js";
-import { fetchARecords, findApex, hostFromUrl, loadNsRecords } from "./src/domain.js";
+import { fetchARecords, fetchPtrRecord, findApex, hostFromUrl, loadNsRecords } from "./src/domain.js";
 import { els } from "./src/dom.js";
 import {
   clearError,
   initializePlaceholders,
   renderIpInfo,
   renderList,
+  setRdns,
   setIpInfoMessage,
   setText,
   showError,
@@ -67,11 +68,21 @@ function loadAddressRecords(hostname, apiToken) {
         return;
       }
 
+      setRdns("Loading...");
       setText(els.ipInfoIp, firstIp);
       setText(els.ipInfoOrg, "Loading...");
       setText(els.ipInfoCompany, "Loading...");
       setText(els.ipInfoAsn, "Loading...");
       setText(els.ipInfoLocation, "Loading...");
+
+      fetchPtrRecord(firstIp)
+        .then((record) => {
+          const value = record?.value ? record.value.replace(/\.$/, "") : "No PTR record found.";
+          setRdns(value);
+        })
+        .catch((error) => {
+          setRdns(error.message);
+        });
 
       fetchIpInfo(firstIp, apiToken)
         .then((info) => renderIpInfo(info, firstIp))

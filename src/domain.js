@@ -14,6 +14,17 @@ export async function fetchARecords(hostname) {
   return answersOfType(json, 1).map((answer) => normalizeDnsRecord(answer, json.resolver));
 }
 
+export async function fetchPtrRecord(ip) {
+  const arpaName = ipv4ToArpa(ip);
+  if (!arpaName) {
+    throw new Error("Reverse DNS unavailable for this IP.");
+  }
+
+  const json = await doh(arpaName, "PTR");
+  const ptr = answersOfType(json, 12)[0];
+  return ptr ? normalizeDnsRecord(ptr, json.resolver) : null;
+}
+
 export async function findApex(hostname) {
   const labels = (hostname || "").split(".").filter(Boolean);
 
@@ -62,4 +73,9 @@ function compareDnsRecordValues(a, b) {
     numeric: true,
     sensitivity: "base"
   });
+}
+
+function ipv4ToArpa(ip) {
+  const p = String(ip || "").trim().split(".");
+  return p.length === 4 && p.every(n => n !== "" && n >= 0 && n <= 255) ? `${p.reverse().join(".")}.in-addr.arpa` : null;
 }

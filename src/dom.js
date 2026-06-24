@@ -8,6 +8,7 @@ export const els = {
   nsEmpty: document.getElementById("ns-empty"),
   aList: document.getElementById("a-host-list"),
   aEmpty: document.getElementById("a-host-empty"),
+  ipInfoRdns: document.getElementById("ipinfo-rdns"),
   ipInfoIp: document.getElementById("ipinfo-ip"),
   ipInfoOrg: document.getElementById("ipinfo-org"),
   ipInfoCompany: document.getElementById("ipinfo-company"),
@@ -19,7 +20,3 @@ export const els = {
   refreshDns: document.getElementById("refresh-dns"),
   error: document.getElementById("error")
 };
-
-export function byId(id) {
-  return document.getElementById(id);
-}

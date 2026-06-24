@@ -89,7 +89,12 @@ export function renderIpInfo(info, ip) {
   setText(els.ipInfoLocation, location);
 }
 
+export function setRdns(value) {
+  setText(els.ipInfoRdns, value);
+}
+
 export function setIpInfoMessage(message) {
+  setText(els.ipInfoRdns, message);
   setText(els.ipInfoIp, message);
   setText(els.ipInfoOrg, message);
   setText(els.ipInfoCompany, message);

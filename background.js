@@ -1,5 +1,12 @@
-const DNSLT_CONTEXT_MENU_ID = "open-dnslt-domain";
-const DNSLT_BASE_URL = "https://www.dnslt.com/";
+const MENU_PARENT = "domain-insight-parent";
+const MENUS = [
+  { id: "open-dnslt", title: "DNSLT", url: (target) => `https://www.dnslt.com/${target.type}/${encodeURIComponent(target.value)}` },
+  { id: "open-whois", title: "Whois.com", url: (target) => `https://www.whois.com/whois/${encodeURIComponent(target.value)}` },
+  { id: "open-intodns", title: "intoDNS", url: (target) => `https://intodns.com/${encodeURIComponent(target.value)}` },
+  { id: "open-dnschecker", title: "DNSChecker", url: (target) => `https://dnschecker.org/#A/${encodeURIComponent(target.value)}` },
+  { id: "open-ipinfo", title: "IPinfo", url: (target) => `https://ipinfo.io/${encodeURIComponent(target.value)}` }
+];
+
 const DOMAIN_PATTERN = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
 const IPV4_PATTERN = /^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/;
 
@@ -11,15 +18,25 @@ chrome.runtime.onStartup.addListener(setupContextMenu);
 function setupContextMenu() {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
-      id: DNSLT_CONTEXT_MENU_ID,
-      title: "Open selected domain/IP in DNSLT",
+      id: MENU_PARENT,
+      title: "Domain Insight '%s'",
       contexts: ["selection"]
     });
+
+    for (const menu of MENUS) {
+      chrome.contextMenus.create({
+        id: menu.id,
+        parentId: MENU_PARENT,
+        title: menu.title,
+        contexts: ["selection"]
+      });
+    }
   });
 }
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (!info || info.menuItemId !== DNSLT_CONTEXT_MENU_ID) return;
+  const menu = MENUS.find(m => m.id === info.menuItemId);
+  if (!menu) return;
 
   const target = normalizeSelectedTarget(info.selectionText || "");
 
@@ -28,7 +45,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     return;
   }
 
-  openDnsltTarget(target);
+  const url = menu.url(target);
+  if (!chrome.tabs?.create) return;
+  chrome.tabs.create({ url });
 });
 
 function normalizeSelectedTarget(value) {
@@ -64,15 +83,7 @@ function hostnameFromUrl(value) {
   }
 }
 
-function openDnsltTarget(target) {
-  const url = `${DNSLT_BASE_URL}${target.type}/${encodeURIComponent(target.value)}`;
 
-  if (!chrome.tabs?.create) {
-    return;
-  }
-
-  chrome.tabs.create({ url });
-}
 
 function showInvalidSelectionTooltip(tabId) {
   if (!tabId || !chrome.scripting?.executeScript) {

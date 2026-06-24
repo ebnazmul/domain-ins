@@ -15,6 +15,13 @@
     "https://cloudflare-dns.com/*",
     "https://dns.google/*",
     "https://rdap.org/*",
-    "https://ipinfo.io/*"
+    "https://ipinfo.io/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://dashboard.tawk.to/*"],
+      "js": ["src/tawk-reply.js"]
+    }
   ]
 }
