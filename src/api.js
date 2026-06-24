@@ -1,13 +1,25 @@
 import { DNS_RESOLVERS, IPINFO_URL, RDAP_DOMAIN_URL } from "./config.js";
 
-async function fetchJson(url, options, errorPrefix) {
-  const response = await fetch(url, options);
+async function fetchJson(url, options = {}, errorPrefix, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    throw new Error(`${errorPrefix} (${response.status})`);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+
+    if (!response.ok) {
+      throw new Error(`${errorPrefix} (${response.status})`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    clearTimeout(id);
+    if (error.name === "AbortError") {
+      throw new Error(`${errorPrefix} (Timeout)`);
+    }
+    throw error;
   }
-
-  return response.json();
 }
 
 export async function doh(name, type) {
@@ -54,8 +66,12 @@ export async function fetchIpInfo(ip, token) {
     throw new Error("Add your IPinfo token in Settings.");
   }
 
-  const url = `${IPINFO_URL}${encodeURIComponent(ip)}?token=${encodeURIComponent(token)}`;
-  return fetchJson(url, undefined, "IPinfo lookup failed");
+  const url = `${IPINFO_URL}${encodeURIComponent(ip)}`;
+  return fetchJson(
+    url,
+    { headers: { Authorization: `Bearer ${token}` } },
+    "IPinfo lookup failed"
+  );
 }
 
 function vcardFn(vcardArray) {
@@ -99,9 +115,23 @@ async function fetchRegistrarViaLink(links = []) {
 }
 
 export async function fetchDomainStatus(apexDomain) {
-  const response = await fetch(`${RDAP_DOMAIN_URL}${encodeURIComponent(apexDomain)}`, {
-    headers: { accept: "application/rdap+json" }
-  });
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 8000);
+
+  let response;
+  try {
+    response = await fetch(`${RDAP_DOMAIN_URL}${encodeURIComponent(apexDomain)}`, {
+      headers: { accept: "application/rdap+json" },
+      signal: controller.signal
+    });
+    clearTimeout(id);
+  } catch (error) {
+    clearTimeout(id);
+    if (error.name === "AbortError") {
+      throw new Error("RDAP lookup failed (Timeout)");
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     if (response.status === 404) {

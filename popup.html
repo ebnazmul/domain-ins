@@ -24,6 +24,7 @@
                   <span>IPinfo Token</span>
                   <input id="api-token" type="password" placeholder="Enter IPinfo token" autocomplete="off" />
                 </label>
+                <div class="muted" style="margin-bottom: 8px; line-height: 1.3;">Stored locally in browser, sent only to ipinfo.io.</div>
                 <div class="settings-actions">
                   <button id="save-token" type="submit">Save</button>
                   <span id="token-status" class="token-status hidden">Saved</span>
@@ -72,6 +73,9 @@
       </section>
 
       <section id="error" class="error hidden"></section>
+      <section id="unsupported-warning" class="error hidden" style="background:#fff7ed; border-color:#f97316; color:#c2410c;">
+        ⚠️ This extension requires a valid web page URL (e.g. https://example.com). Chrome internal pages or local files are not supported.
+      </section>
     </main>
 
     <script type="module" src="popup.js"></script>

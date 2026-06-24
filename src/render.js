@@ -5,6 +5,19 @@ let tokenStatusTimer = null;
 export function setText(el, value) {
   if (!el) return;
   el.textContent = value ?? "Unknown";
+  el.title = "Click to copy";
+  el.style.cursor = "pointer";
+  el.onclick = async () => {
+    const text = value ?? "Unknown";
+    if (text !== "Unknown" && !text.startsWith("Loading") && !text.startsWith("Waiting") && !text.startsWith("Unavailable")) {
+      try {
+        await navigator.clipboard.writeText(text);
+        const original = el.textContent;
+        el.textContent = "Copied!";
+        setTimeout(() => el.textContent = original, 800);
+      } catch {}
+    }
+  };
 }
 
 export function showError(message) {
@@ -59,6 +72,16 @@ export function renderList(listEl, emptyEl, values, transform) {
       li.appendChild(link);
     } else {
       li.textContent = value;
+      li.title = "Click to copy";
+      li.style.cursor = "pointer";
+      li.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          const original = li.textContent;
+          li.textContent = "Copied!";
+          setTimeout(() => li.textContent = original, 800);
+        } catch {}
+      };
     }
     fragment.appendChild(li);
   }

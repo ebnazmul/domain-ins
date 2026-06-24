@@ -168,7 +168,13 @@ async function run() {
   const hostname = hostFromUrl(url);
 
   if (!hostname) {
-    showError("Could not extract hostname from current tab URL.");
+    const warning = document.getElementById("unsupported-warning");
+    if (warning) {
+      warning.classList.remove("hidden");
+      document.querySelectorAll("main > section:not(#unsupported-warning)").forEach(s => s.style.display = "none");
+    } else {
+      showError("Could not extract hostname from current tab URL.");
+    }
     return;
   }
 
